@@ -6,8 +6,24 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15/umd/prop-types.development.js"></script>
     <style>
         .pressed { background-color: lightgrey; }
+        @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loading {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+      }
+
     </style>
 </head>
 <body>
@@ -24,6 +40,12 @@
       );
     };
 
+  Header.propTypes = {
+  title: PropTypes.string.isRequired,
+  styles: PropTypes.object
+  };
+
+
     const Footer = () => {
       const styles = {
         backgroundColor: 'lightblue',
@@ -38,6 +60,12 @@
       );
     };
 
+  Footer.propTypes = {
+  copyright: PropTypes.string.isRequired,
+  styles: PropTypes.object
+  };
+
+
     const Post = ({ title, body }) => {
       return (
         React.createElement('li', null,
@@ -47,44 +75,59 @@
       );
     };
 
+  Post.propTypes = {
+  title: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired
+  };
+
     const Posts = () => {
-      const styles = {
-        listStyleType: 'none',
-        padding: 0
-      };
-      const [posts, setPosts] = React.useState([]);
+  const styles = {
+    listStyleType: 'none',
+    padding: 0
+  };
+  const [posts, setPosts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true); // Estado para controlar la animación de carga
 
-      const getPosts = async () => {
-        try {
-          const apiResponse = await fetch('https://api.tiburoncin.lat/22266/posts');
-          const jsonPosts = await apiResponse.json();
-          const formattedPosts = jsonPosts.map(({ title, content }) => ({ title, body: content }));
-          setPosts(formattedPosts);
-        } catch (error) {
-          console.error('Error fetching posts:', error);
-        }
-      };
+  const getPosts = async () => {
+    try {
+      const apiResponse = await fetch('https://api.tiburoncin.lat/22266/posts');
+      const jsonPosts = await apiResponse.json();
+      const formattedPosts = jsonPosts.map(({ title, content }) => ({ title, body: content }));
+      setPosts(formattedPosts);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false); // Una vez completada la solicitud (ya sea éxito o error), se detiene la animación de carga
+    }
+  };
 
-      React.useEffect(() => {
-        getPosts();
-      }, []);
+  React.useEffect(() => {
+    getPosts();
+  }, []);
 
-      if (posts.length === 0) {
-        return (
-          React.createElement('ul', { style: styles },
-            React.createElement('li', null, 'Loading...')
-          )
-        );
-      }
+  if (loading) {
+    return (
+      <div className="loading"></div> // Muestra la animación de carga mientras se está realizando la solicitud
+    );
+  }
 
-      return (
-        React.createElement('ul', { style: styles },
-          posts.map(({ title, body }, index) => (
-            React.createElement(Post, { key: index, title: title, body: body })
-          ))
-        )
-      );
-    };
+  if (posts.length === 0) {
+    return (
+      <ul style={styles}>
+        <li>Loading...</li>
+      </ul>
+    );
+  }
+
+  return (
+    <ul style={styles}>
+      {posts.map(({ title, body }, index) => (
+        <Post key={index} title={title} body={body} />
+      ))}
+    </ul>
+  );
+};
+
 
     const App = () => {
       const styles = {

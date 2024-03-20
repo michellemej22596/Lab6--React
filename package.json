@@ -1,0 +1,14 @@
+{
+  "name": "lab6--react",
+  "version": "1.0.0",
+  "description": "Michelle Mejía 2259",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "prop-types": "^15.8.1"
+  }
+}
