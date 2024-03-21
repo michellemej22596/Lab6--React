@@ -6,7 +6,8 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/prop-types@15/umd/prop-types.development.js"></script>
+    <script src="https://unpkg.com/prop-types/prop-types.js"></script>
+
     <style>
         .pressed { background-color: lightgrey; }
         @keyframes spin {
@@ -27,8 +28,10 @@
     </style>
 </head>
 <body>
+
     <div id="root"></div>
     <script type="text/babel"> 
+
     const Header = () => {
       const styles = {
         backgroundColor: 'lightblue',
@@ -40,11 +43,10 @@
       );
     };
 
-  Header.propTypes = {
-  title: PropTypes.string.isRequired,
-  styles: PropTypes.object
-  };
-
+    Header.propTypes = {
+       title: PropTypes.string.isRequired,
+       styles: PropTypes.object
+     };
 
     const Footer = () => {
       const styles = {
@@ -60,11 +62,10 @@
       );
     };
 
-  Footer.propTypes = {
-  copyright: PropTypes.string.isRequired,
-  styles: PropTypes.object
-  };
-
+    Footer.propTypes = {
+      copyright: PropTypes.string.isRequired,
+      styles: PropTypes.object
+     };
 
     const Post = ({ title, body }) => {
       return (
@@ -75,61 +76,62 @@
       );
     };
 
-  Post.propTypes = {
-  title: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired
-  };
+    Post.propTypes = {
+      title: PropTypes.string.isRequired,
+      body: PropTypes.string.isRequired
+    };
 
-  const Posts = () => {
-  const styles = {
-    listStyleType: 'none',
-    padding: 0
-  };
-  const [posts, setPosts] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false); // Estado para controlar errores de la API
 
-  const getPosts = async () => {
-    try {
-      const apiResponse = await fetch('https://api.tiburoncin.lat/22266/posts');
-      if (!apiResponse.ok) {
-        throw new Error('Error al obtener los posts');
+    const Posts = () => {
+      const styles = {
+        listStyleType: 'none',
+        padding: 0
+      };
+      const [posts, setPosts] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [error, setError] = React.useState(false); // Estado para controlar errores de la API
+
+      const getPosts = async () => {
+        try {
+          const apiResponse = await fetch('https://api.tiburoncin.lat/22266/posts');
+          if (!apiResponse.ok) {
+            throw new Error('Error al obtener los posts');
+          }
+          const jsonPosts = await apiResponse.json();
+          const formattedPosts = jsonPosts.map(({ title, content }) => ({ title, body: content }));
+          setPosts(formattedPosts);
+        } catch (error) {
+          console.error('Error fetching posts:', error);
+          setError(true); // Establecer el estado de error en verdadero en caso de error de la API
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      React.useEffect(() => {
+        getPosts();
+      }, []);
+
+      if (loading) {
+        return <div className="loading"></div>;
       }
-      const jsonPosts = await apiResponse.json();
-      const formattedPosts = jsonPosts.map(({ title, content }) => ({ title, body: content }));
-      setPosts(formattedPosts);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      setError(true); // Establecer el estado de error en verdadero en caso de error de la API
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  React.useEffect(() => {
-    getPosts();
-  }, []);
+      if (error) {
+        return <div>Error al cargar los posts. Inténtalo de nuevo más tarde.</div>;
+      }
 
-  if (loading) {
-    return <div className="loading"></div>;
-  }
+      if (posts.length === 0) {
+        return <div>No hay publicaciones disponibles en este momento.</div>;
+      }
 
-  if (error) {
-    return <div>Error al cargar los posts. Inténtalo de nuevo más tarde.</div>;
-  }
-
-  if (posts.length === 0) {
-    return <div>No hay publicaciones disponibles en este momento.</div>;
-  }
-
-  return (
-    <ul style={styles}>
-      {posts.map(({ title, body }, index) => (
-        <Post key={index} title={title} body={body} />
-      ))}
-    </ul>
-  );
-};
+      return (
+        <ul style={styles}>
+          {posts.map(({ title, body }, index) => (
+            <Post key={index} title={title} body={body} />
+          ))}
+        </ul>
+      );
+    };
 
 
     const App = () => {
@@ -146,7 +148,7 @@
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
+    root.render(<App />);
     </script>
 </body>
 </html>
