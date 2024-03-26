@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <title>React Blog</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -30,7 +31,7 @@
 <body>
 
     <div id="root"></div>
-    <script type="text/babel"> 
+    <script type="text/babel">
 
     const Header = () => {
       const styles = {
@@ -43,10 +44,10 @@
       );
     };
 
-    Header.propTypes = {
-       title: PropTypes.string.isRequired,
-       styles: PropTypes.object
-     };
+//    Header.propTypes = {
+//       title: PropTypes.string.isRequired,
+//       styles: PropTypes.object
+//     };
 
     const Footer = () => {
       const styles = {
@@ -62,49 +63,57 @@
       );
     };
 
-    Footer.propTypes = {
-      copyright: PropTypes.string.isRequired,
-      styles: PropTypes.object
-     };
+//    Footer.propTypes = {
+//      copyright: PropTypes.string.isRequired,
+//      styles: PropTypes.object
+//     };
 
-    const Post = ({ title, body }) => {
-      return (
-        React.createElement('li', null,
-          React.createElement('h1', null, title),
-          React.createElement('p', null, body)
-        )
-      );
-    };
+    const Post = ({ title, description, team, goals_scored, image_base64 }) => {
+        return React.createElement(
+            'div',
+            null,
+            React.createElement('h1', null, title),
+            React.createElement('p', null, description),
+            React.createElement('p', null, 'Team: ', team),
+            React.createElement('p', null, 'Goals Scored: ', goals_scored),
+            React.createElement('img', { src: image_base64, alt: 'Post Image', style: { maxWidth: '100%' } })
+        );
+};
 
-    Post.propTypes = {
-      title: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired
-    };
+
+Post.propTypes = {
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    team: PropTypes.string.isRequired,
+    goals_scored: PropTypes.number.isRequired,
+    image_base64: PropTypes.string.isRequired
+};
 
 
     const Posts = () => {
-      const styles = {
-        listStyleType: 'none',
-        padding: 0
-      };
+        const styles = {
+            listStyleType: 'none',
+            padding: 0
+        };
+
       const [posts, setPosts] = React.useState([]);
       const [loading, setLoading] = React.useState(true);
       const [error, setError] = React.useState(false); // Estado para controlar errores de la API
 
       const getPosts = async () => {
         try {
-          const apiResponse = await fetch('https://api.tiburoncin.lat/22266/posts');
-          if (!apiResponse.ok) {
-            throw new Error('Error al obtener los posts');
-          }
-          const jsonPosts = await apiResponse.json();
-          const formattedPosts = jsonPosts.map(({ title, content }) => ({ title, body: content }));
-          setPosts(formattedPosts);
+            const apiResponse = await fetch('https://api.tiburoncin.lat/22596/posts');
+            if (!apiResponse.ok) {
+                throw new Error('Error al obtener los posts');
+            }
+            const jsonPosts = await apiResponse.json();
+            const formattedPosts = jsonPosts.map(({ title, description, team, goals_scored, image_base64  }) => ({ title, description, team, goals_scored, image_base64  }));
+            setPosts(formattedPosts);
         } catch (error) {
-          console.error('Error fetching posts:', error);
-          setError(true); // Establecer el estado de error en verdadero en caso de error de la API
+            console.error('Error fetching posts:', error);
+            setError(true); // Establecer el estado de error en verdadero en caso de error de la API
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
       };
 
@@ -124,10 +133,10 @@
         return <div>No hay publicaciones disponibles en este momento.</div>;
       }
 
-      return (
+       return (
         <ul style={styles}>
-          {posts.map(({ title, body }, index) => (
-            <Post key={index} title={title} body={body} />
+          {posts.map(({ title,  description, team, goals_scored, image_base64}, index) => (
+            <Post key={index} title={title}  description={description} team={team} goals_scored={goals_scored} image_base64={image_base64} />
           ))}
         </ul>
       );
@@ -150,5 +159,6 @@
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
     </script>
+
 </body>
 </html>
