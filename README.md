@@ -15,3 +15,5 @@ Clona el repositorio: git clone https://github.com/tu-usuario/react-blog.git
 
 Instala las dependencias: npm install
 
+NOTA: Se mejoró el diseño público para el proyecto, por lo que si se desean seguir los cambios de diseño puedes encontrarlos en el nuevo repositorio  https://github.com/michellemej22596/BlogMujeresEnElFutbol.git
+
